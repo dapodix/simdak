@@ -1,4 +1,6 @@
-JENIS_PENGGUNAAN = {
+from typing import Dict, Optional
+
+JENIS_PENGGUNAAN: Dict[str, Dict[str, str]] = {
     "1": {
         "21": "bahan pembelajaran peserta didik yang dibutuhkan sesuai dengan kegiatan tematik",
         "22": "penyediaan Alat Permainan Edukatif (APE)",
@@ -37,3 +39,11 @@ JENIS_KOMPONEN = {
     "2": "Kegiatan Pendukung",
     "3": "Kegiatan Lainnya",
 }
+
+
+def get_key(nama: str, data: Dict[str, str] = JENIS_KOMPONEN) -> Optional[int]:
+    nama = nama.replace("\r\n", " ")
+    for k, v in data.items():
+        if v == nama:
+            return int(k)
+    return None

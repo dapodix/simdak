@@ -11,7 +11,7 @@ class SimdakPaud(BaseSimdakPaud):
         self._password = password
         self._login = self.login()
         self._modul = self.modul()
-        self.rkas = RkasPaud(self)
+        self.rkas = RkasPaud(self._session)
 
     def login(self) -> bool:
         params = {"r": "site/login"}
