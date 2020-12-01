@@ -30,6 +30,11 @@ class SimdakPaud(BaseSimdakPaud):
             return True
         return False
 
+    def logout(self) -> bool:
+        params = {"r": "site/logout"}
+        res = self._session.get(self._base_url, params=params)
+        return res.ok
+
     def modul(self, jenisdak: str = "daknfpaud") -> bool:
         params = {"r": "site/modul", "jenisdak": jenisdak}
         res = self._session.get(self._base_url, params=params)
