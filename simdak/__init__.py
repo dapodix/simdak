@@ -1,5 +1,5 @@
-__version__ = "0.1.0"
-
 from .paud import SimdakPaud
+from .template import TEMPLATE_DIR
+from .version import __version__
 
 __all__ = ["SimdakPaud"]

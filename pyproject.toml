@@ -1,8 +1,16 @@
 [tool.poetry]
 name = "simdak"
 version = "0.1.0"
-description = ""
-authors = ["hexatester <revolusi147id@gmail.com>"]
+description = "Importer-exporter data Simdak Kemdikbud"
+authors = ["hexatester <habibrohman@gmail.com>"]
+license = "GPLv3"
+readme = "README.md"
+homepage = "https://github.com/dapodix/simdak"
+repository = "https://github.com/dapodix/simdak"
+include = [
+    "LICENSE",
+    "README.md",
+]
 
 [tool.poetry.dependencies]
 python = "^3.7"
