@@ -1,7 +1,6 @@
 from requests import Session
 from logging import getLogger
-from .base import BaseSimdakPaud
-from .rkas import RkasPaud
+from . import BaseSimdakPaud, RkasPaud
 
 
 class SimdakPaud(BaseSimdakPaud):

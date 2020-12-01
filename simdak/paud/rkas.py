@@ -5,8 +5,8 @@ from typing import Dict, List, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .paud import SimdakPaud
-from .base import BaseSimdakPaud
-from .jenis_penggunaan import JENIS_KOMPONEN, JENIS_PENGGUNAAN, PENGGUNAAN
+
+from . import BaseSimdakPaud, JENIS_KOMPONEN, JENIS_PENGGUNAAN, PENGGUNAAN
 
 
 class RkasData(BaseSimdakPaud):

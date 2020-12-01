@@ -1,4 +1,3 @@
-from .paud import SimdakPaud
 from .template import TEMPLATE_DIR
 from .version import __version__
 
