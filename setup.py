@@ -20,7 +20,7 @@ setup(
     description="Importer-exporter data Simdak Kemdikbud",
     packages=packages,
     package_data={"simdak": ["template/*.xlsx"]},
-    install_requires=["python", "requests", "bs4", "openpyxl", "lxml"],
+    install_requires=["python", "requests", "bs4", "openpyxl", "lxml", "click"],
     include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
