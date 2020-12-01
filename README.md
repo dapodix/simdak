@@ -1,6 +1,10 @@
-# simdak-paud
+# Simdak
 
-Import-export excell [Simdak Paud-Dikmas](https://app.paud-dikmas.kemdikbud.go.id/simdak/)
+Python client module Simdak Kemdikbud
+
+## Fitur
+
+Fitur export dan import data _Simdak Paud-Dikmas_.
 
 ## Legal / Hukum
 

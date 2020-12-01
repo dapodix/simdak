@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "simdak-paud"
+name = "simdak"
 version = "0.1.0"
 description = ""
 authors = ["hexatester <revolusi147id@gmail.com>"]

@@ -1,4 +1,4 @@
-from simdak_paud import __version__
+from simdak import __version__
 
 
 def test_version():
