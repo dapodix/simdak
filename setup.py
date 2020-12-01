@@ -2,7 +2,7 @@ import os
 from setuptools import setup, find_packages
 
 __version__ = ""
-packages = find_packages(exclude=["tests*", "template*"])
+packages = find_packages(exclude=["tests*"])
 
 fn = os.path.join("telegram", "version.py")
 with open(fn) as fh:
