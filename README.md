@@ -1,5 +1,8 @@
 # Simdak
 
+[![simdak - PyPi](https://img.shields.io/pypi/v/simdak)](https://pypi.org/project/simdak/)
+[![Group Telegram](https://img.shields.io/badge/Telegram-Group-blue.svg)](https://t.me/simdak_paud)
+
 Python client module Simdak Kemdikbud
 
 ## Fitur
