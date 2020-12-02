@@ -47,6 +47,8 @@ def imports(
     logger = getLogger("paud-import")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
+    if not filename.endswith(".xlsx"):
+        filename += ".xlsx"
     filepath = os.path.join(CWD, filename)
     ws: Worksheet = None
     if os.path.isfile(filepath):
