@@ -9,7 +9,9 @@ from simdak.template import TEMPLATE_FILE
 CWD = os.getcwd()
 
 
-def exports(email: str, password: str, filename: str = "", sheet: str = "Sheet1"):
+def exports(
+    email: str, password: str, filename: str = "", sheet: str = "Sheet1"
+) -> None:
     print("Export")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
@@ -34,11 +36,11 @@ def exports(email: str, password: str, filename: str = "", sheet: str = "Sheet1"
 def imports(
     email: str,
     password: str,
-    filename: str = "",
+    filename: str,
     start: int = 1,
     sheet: str = "Sheet1",
     header: bool = True,
-):
+) -> None:
     print("Import")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
@@ -56,3 +58,4 @@ def imports(
         result = rkas.create(data)
         if result:
             result.to_row(ws, row)
+    wb.save(filepath)
