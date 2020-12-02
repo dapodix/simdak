@@ -35,7 +35,7 @@ def template(name: str):
     confirmation_prompt=True,
     help=PASSWORD_HELP,
 )
-@click.option("--sheet", default="Sheet1", required=False, sheet=SHEET_HELP)
+@click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
 @click.argument("file", default="Simdak-Paud.xlsx", required=True)
 def exports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengeksport data {email} ke {file}")
@@ -51,7 +51,7 @@ def exports(email: str, password: str, sheet: str, file: str):
     confirmation_prompt=True,
     help=PASSWORD_HELP,
 )
-@click.option("--sheet", default="Sheet1", required=False, sheet=SHEET_HELP)
+@click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
 @click.argument("file", default="Simdak-Paud.xlsx", required=True)
 def imports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengimport data {email} dari {file}")
