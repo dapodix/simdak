@@ -19,10 +19,10 @@ def paud():
 
 @paud.command("template")  # type: ignore
 @click.argument("nama", default="Simdak-Paud.xlsx", required=True)
-def template(name: str):
-    name = name if name.endswith(".xlsx") else name + ".xlsx"
-    click.echo(f"Membuat template dengan nama {name}")
-    dst = os.path.abspath(os.path.join(CWD, name))
+def template(nama: str):
+    nama = nama if nama.endswith(".xlsx") else nama + ".xlsx"
+    click.echo(f"Membuat template dengan nama {nama}")
+    dst = os.path.abspath(os.path.join(CWD, nama))
     shutil.copy(TEMPLATE_FILE, dst)
 
 
