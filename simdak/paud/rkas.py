@@ -126,6 +126,20 @@ class Rkas(BaseSimdakPaud):
                 continue
         return results
 
+    def create(
+        self, rkas_data: RkasData, semester_id: int = 20201
+    ) -> Optional[RkasData]:
+        data = rkas_data.as_data()
+        data.update({"yt0": "Simpan"})
+        params = {"r": "boppaudrkas/creat", "id": self.id, "semester_id": semester_id}
+        res = self._session.post(self._base_url, data=data, params=params)
+        if not res.ok:
+            return None
+        soup = BeautifulSoup(res.text, "html.parser")
+        table: List[Tag] = soup.findAll("table")
+        tr: Tag = table[-1].findAll("tr")[-1]
+        return RkasData.from_tr(tr)
+
 
 class SimdakRkasPaud(BaseSimdakPaud):
     def __call__(self, semester_id: int = 20201) -> List[Rkas]:
