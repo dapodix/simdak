@@ -1,7 +1,8 @@
+from __future__ import annotations
 from bs4 import BeautifulSoup, Tag
 from dataclasses import dataclass
 from requests import Session
-from typing import Dict, List, TYPE_CHECKING
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 from . import (
     BaseSimdakPaud,
@@ -57,6 +58,28 @@ class RkasData(BaseSimdakPaud):
         ]
         return ", ".join(s)
 
+    @classmethod
+    def from_tr(cls, tr: Tag) -> RkasData:
+        tds = tr.findAll("td")
+        if not tds:
+            raise ValueError("Data tidak ditemukan")
+        jenis_komponen_id = get_key(tds[2].get_text(), JENIS_KOMPONEN)
+        if not jenis_komponen_id:
+            raise ValueError(f"Jenis Komponen {jenis_komponen_id} tidak valid")
+        jenis_penggunaan_id = get_key(
+            tds[3].get_text(), JENIS_PENGGUNAAN[jenis_komponen_id]
+        )
+        if not jenis_penggunaan_id:
+            raise ValueError(f"Jenis Penggunaan {jenis_penggunaan_id} tidak valid")
+        return cls(
+            jenis_komponen_id=jenis_komponen_id,
+            jenis_penggunaan_id=jenis_penggunaan_id,
+            jenisbelanja=tds[4].get_text(),
+            qty=int(tds[5].get_text()),
+            satuan=tds[6].get_text(),
+            hargasatuan=int(tds[7].get_text()),
+        )
+
 
 class Rkas(BaseSimdakPaud):
     def __init__(
@@ -96,33 +119,12 @@ class Rkas(BaseSimdakPaud):
         soup = BeautifulSoup(res.text, "html.parser")
         table: Tag = soup.findAll("table")[1]
         for tr in table.findAll("tr"):
-            tds = tr.findAll("td")
-            if not tds:
+            try:
+                result = RkasData.from_tr(tr)
+                results.append(result)
+            except ValueError:
                 continue
-            jenis_komponen_id = get_key(tds[2].get_text(), JENIS_KOMPONEN)
-            if not jenis_komponen_id:
-                continue
-            jenis_penggunaan_id = get_key(
-                tds[3].get_text(), JENIS_PENGGUNAAN[jenis_komponen_id]
-            )
-            if not jenis_penggunaan_id:
-                continue
-            result = RkasData(
-                jenis_komponen_id=jenis_komponen_id,
-                jenis_penggunaan_id=jenis_penggunaan_id,
-                jenisbelanja=tds[4].get_text(),
-                qty=int(tds[5].get_text()),
-                satuan=tds[6].get_text(),
-                hargasatuan=int(tds[7].get_text()),
-            )
-            results.append(result)
         return results
-
-    def create(self, rkas_data: RkasData, semester_id: int = 20201):
-        data = rkas_data.as_data()
-        data.update({"yt0": "Simpan"})
-        params = {"r": "boppaudrkas/creat", "id": self.id, "semester_id": semester_id}
-        res = self._session.post(self._base_url, data=data, params=params)
 
 
 class SimdakRkasPaud(BaseSimdakPaud):
