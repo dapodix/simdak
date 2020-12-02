@@ -71,12 +71,15 @@ def imports(
         if not ws[f"{COL_INDEX}{row}"].value:
             break
         data = RkasData.from_row(ws, row)
-        if ws[f"{COL_ID}{row}"].value:
-            old = find_one(rkas_datas, ws[f"{COL_ID}{row}"].value)
-            if old and data == old:
+        old = find_one(rkas_datas, data.data_id)
+        result: Optional[RkasData] = None
+        if old:
+            if old == data:
                 row += 1
                 continue
-        result = rkas.create(data)
+            result = old.update(**data.as_dict())
+        else:
+            result = rkas.create(data)
         if result:
             result.to_row(ws, row)
         row += 1
