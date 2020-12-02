@@ -50,8 +50,10 @@ def imports(
     password: str,
     filename: str,
     start: int = 1,
+    ke: int = 0,
     sheet: str = "Sheet1",
     header: bool = True,
+    save: bool = True,
 ) -> None:
     logger = getLogger("paud-import")
     simdak = SimdakPaud(email, password)
@@ -68,22 +70,28 @@ def imports(
     row = start + 1 if header else start
     imported = 0
     while True:
-        if not ws[f"{COL_INDEX}{row}"].value:
+        if row == ke:
+            break
+        elif not ws[f"{COL_INDEX}{row}"].value:
             break
         data = RkasData.from_row(ws, row)
         old = find_one(rkas_datas, data.data_id)
         result: Optional[RkasData] = None
         if old:
             if old == data:
+                logger.debug(f"{row} dilewati")
                 row += 1
                 continue
+            logger.debug(f"{row} diperbarui")
             result = old.update(**data.as_dict())
         else:
+            logger.debug(f"{row} dibuat")
             result = rkas.create(data)
         if result:
-            result.to_row(ws, row)
+            ws[f"{COL_ID}{row}"] = result.data_id
         row += 1
         imported += 1
     logger.info(f"Berhasil memasukan data sebanyak {imported}")
-    wb.save(filepath)
+    if save:
+        wb.save(filepath)
     logger.info(f"Berhasil menyimpan data terbaru")

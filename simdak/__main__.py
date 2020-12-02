@@ -74,12 +74,25 @@ def exports(email: str, password: str, sheet: str, file: str):
     confirmation_prompt=True,
     help=PASSWORD_HELP,
 )
+@click.option("--dari", default=1, required=False, help="Dari nomor")
+@click.option("--ke", default=0, required=False, help="Ke nomor")
+@click.option("--simpan", default=True, is_flag=True, required=False, help="Simpan id")
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
 @click.argument("file", default="", required=False)
-def imports(email: str, password: str, sheet: str, file: str):
+def imports(
+    email: str, password: str, dari: int, ke: int, simpan: bool, sheet: str, file: str
+):
     click.echo(f"Mengimport data {email} dari {file}")
     try:
-        simdak_paud.imports(email, password, file)
+        simdak_paud.imports(
+            email,
+            password,
+            file,
+            start=int(dari),
+            ke=int(ke),
+            sheet=str(sheet),
+            save=simpan,
+        )
         click.echo(f"Import data berhasil!")
     except Exception as e:
         click.echo(f"Export data gagal! Karena {e}")
