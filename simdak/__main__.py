@@ -22,6 +22,19 @@ def paud():
     pass
 
 
+@paud.command("bantuan")  # type: ignore
+def bantuan():
+    help_msg = (
+        "Untuk mengambil data gunakan export, untuk mengirim data gunakan import. "
+        "export nama-file\n"
+        "import nama-file\n"
+        "Tips : Export dahulu, tambahkan RPD lalu import\n"
+        "!Jangan rubah cell yang berwarna kuning!\n"
+        "!Pastikan setiap RPD bernomor yang urut!\n"
+    )
+    click.echo(help_msg)
+
+
 @paud.command("template")  # type: ignore
 @click.argument("nama", default="Simdak-Paud.xlsx", required=True)
 def template(nama: str):
@@ -29,6 +42,7 @@ def template(nama: str):
     click.echo(f"Membuat template dengan nama {nama}")
     dst = os.path.abspath(os.path.join(CWD, nama))
     shutil.copy(TEMPLATE_FILE, dst)
+    click.echo(f"Berhasil membuat template {nama}")
 
 
 @paud.command("export")  # type: ignore
@@ -44,7 +58,11 @@ def template(nama: str):
 @click.argument("file", default="", required=False)
 def exports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengeksport data {email} ke {file}")
-    simdak_paud.exports(email, password, file)
+    try:
+        simdak_paud.exports(email, password, file)
+        click.echo(f"Export data {email} berhasil!")
+    except Exception as e:
+        click.echo(f"Export data gagal! Karena {e}")
 
 
 @paud.command("import")  # type: ignore
@@ -60,7 +78,11 @@ def exports(email: str, password: str, sheet: str, file: str):
 @click.argument("file", default="", required=False)
 def imports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengimport data {email} dari {file}")
-    simdak_paud.exports(email, password, file)
+    try:
+        simdak_paud.imports(email, password, file)
+        click.echo(f"Import data berhasil!")
+    except Exception as e:
+        click.echo(f"Export data gagal! Karena {e}")
 
 
 main = click.CommandCollection("simdak", sources=[paud])
