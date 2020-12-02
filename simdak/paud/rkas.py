@@ -1,8 +1,11 @@
 from __future__ import annotations
 from bs4 import BeautifulSoup, Tag
 from dataclasses import dataclass
+from openpyxl import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from requests import Session
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Union
+from typing import Dict, List, Optional, Type, TypeVar, TYPE_CHECKING
 
 from . import (
     BaseSimdakPaud,
@@ -14,6 +17,16 @@ from . import (
 
 
 class RkasData(BaseSimdakPaud):
+    MAPPING = {
+        "jenis_komponen_id": "B",
+        "jenis_penggunaan_id": "C",
+        "jenisbelanja": "D",
+        "qty": "E",
+        "satuan": "F",
+        "hargasatuan": "G",
+        "data_id": "H",
+    }
+
     def __init__(
         self,
         jenis_komponen_id: int,
@@ -22,6 +35,7 @@ class RkasData(BaseSimdakPaud):
         qty: int,
         satuan: str,
         hargasatuan: int,
+        data_id: str = "",
     ):
         self.jenis_komponen_id = jenis_komponen_id
         self.jenis_penggunaan_id = jenis_penggunaan_id
@@ -29,6 +43,14 @@ class RkasData(BaseSimdakPaud):
         self.qty = qty
         self.satuan = satuan
         self.hargasatuan = hargasatuan
+        if "=" in data_id:
+            data_id = data_id.split("=")[-1]
+        self.data_id = data_id
+
+    def delete(self) -> bool:
+        params = {"r": "boppaudrkas/delete", "id": self.data_id}
+        res = self._session.get(self._base_url, params=params)
+        return res.ok
 
     def as_data(self, **kwargs) -> dict:
         if self.jenis_komponen_id not in JENIS_PENGGUNAAN:
@@ -47,6 +69,23 @@ class RkasData(BaseSimdakPaud):
         }
         data.update(kwargs)
         return data
+
+    def as_dict(self, **kwargs) -> dict:
+        return {
+            "jenis_komponen_id": self.jenis_komponen_id,
+            "jenis_penggunaan_id": self.jenis_penggunaan_id,
+            "jenisbelanja": self.jenisbelanja,
+            "qty": self.qty,
+            "satuan": self.satuan,
+            "hargasatuan": self.hargasatuan,
+            "data_id": self.data_id,
+        }
+
+    def to_row(self, ws: Union[Worksheet, Workbook], row: int):
+        data = self.as_dict()
+        for k, v in data.items():
+            col = self.MAPPING[k]
+            ws[f"{col}{row}"] = v
 
     def __str__(self) -> str:
         s = [
@@ -78,7 +117,15 @@ class RkasData(BaseSimdakPaud):
             qty=int(tds[5].get_text()),
             satuan=tds[6].get_text(),
             hargasatuan=int(tds[7].get_text()),
+            data_id=tds[10].find("a")["href"] if len(tds) == 11 else "",
         )
+
+    @classmethod
+    def from_row(cls, ws: Union[Worksheet, Workbook], row: int) -> RkasData:
+        data = {}
+        for k, v in cls.MAPPING.items():
+            data[k] = ws[f"{v}{row}"]
+        return cls(**data)
 
 
 class Rkas(BaseSimdakPaud):
@@ -107,10 +154,14 @@ class Rkas(BaseSimdakPaud):
         self.url = url
         self.id = self.url.split("&")[1].split("=")[-1]
 
-    def __call__(self, semester_id: int = 20201) -> List[RkasData]:
-        return self.get(semester_id)
+    def __call__(
+        self, semester_id: int = 20201, save_as: Type[RkasData] = RkasData
+    ) -> List[RkasData]:
+        return self.get(semester_id, save_as)
 
-    def get(self, semester_id: int = 20201) -> List[RkasData]:
+    def get(
+        self, semester_id: int = 20201, save_as: Type[RkasData] = RkasData
+    ) -> List[RkasData]:
         results: List[RkasData] = []
         params = {"r": "boppaudrkas/create", "id": self.id, "semester_id": semester_id}
         res = self._session.get(self._base_url, params=params)
@@ -120,7 +171,7 @@ class Rkas(BaseSimdakPaud):
         table: Tag = soup.findAll("table")[1]
         for tr in table.findAll("tr"):
             try:
-                result = RkasData.from_tr(tr)
+                result = save_as.from_tr(tr)
                 results.append(result)
             except ValueError:
                 continue
@@ -143,6 +194,9 @@ class Rkas(BaseSimdakPaud):
 
 class SimdakRkasPaud(BaseSimdakPaud):
     def __call__(self, semester_id: int = 20201) -> List[Rkas]:
+        return self.get(semester_id)
+
+    def get(self, semester_id: int = 20201) -> List[Rkas]:
         results: List[Rkas] = []
         params = {
             "r": "boppaudrkas/index",

@@ -13,6 +13,8 @@ class SimdakPaud(BaseSimdakPaud):
         self.rkas = SimdakRkasPaud()
 
     def login(self) -> bool:
+        if self._login:
+            raise PermissionError("Anda sudah login.")
         params = {"r": "site/login"}
         res = self._session.get(self._base_url, params=params)
         if not res.status_code == 200:
@@ -43,3 +45,6 @@ class SimdakPaud(BaseSimdakPaud):
         ):
             return True
         return False
+
+    def __del__(self):
+        self.logout()
