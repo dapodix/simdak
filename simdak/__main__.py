@@ -2,7 +2,8 @@ import click
 import os
 import shutil
 
-from . import TEMPLATE_DIR, paud
+from . import paud
+from .template import TEMPLATE_FILE
 
 CWD = os.getcwd()
 
@@ -17,7 +18,7 @@ def main():
 def template(nama: str):
     click.echo("Membuat template...")
     shutil.copy(
-        os.path.join(TEMPLATE_DIR, "Simdak-Paud.xlsx"),
+        TEMPLATE_FILE,
         os.path.join(CWD, nama),
     )
 

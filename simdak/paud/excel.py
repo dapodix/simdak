@@ -4,24 +4,24 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import Union
 from . import RkasData, SimdakPaud
+from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
 
 
-def exports(email: str, password: str, filepath: str = "", sheet: str = "Sheet1"):
+def exports(email: str, password: str, filename: str = "", sheet: str = "Sheet1"):
     print("Export")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
     rkas_datas = rkas.get(save_as=RkasData)
-    filepath = filepath or os.path.join(CWD, f"{rkas.npsn}.xlsx")
+    filename = filename or f"{rkas.npsn}.xlsx"
+    if not filename.endswith(".xlsx"):
+        filename += ".xlsx"
+    filepath = os.path.join(CWD, filename)
     ws: Worksheet = None
-    if os.path.isfile(filepath):
-        wb = load_workbook(filepath)
-        ws = wb.get_sheet_by_name(sheet)
-    else:
-        wb = Workbook()
-        ws = wb.active
-        ws.title = sheet
+    wb = load_workbook(TEMPLATE_FILE)
+    ws = wb.active
+    ws.title = sheet
     ws["A1"] = "No"
     for k, v in RkasData.MAPPING.items():
         ws[f"{v}1"] = k.replace("_", " ").title()
@@ -34,7 +34,7 @@ def exports(email: str, password: str, filepath: str = "", sheet: str = "Sheet1"
 def imports(
     email: str,
     password: str,
-    filepath: str = "",
+    filename: str = "",
     start: int = 1,
     sheet: str = "Sheet1",
     header: bool = True,
@@ -42,7 +42,7 @@ def imports(
     print("Import")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
-    filepath = filepath or os.path.join(CWD, f"{rkas.npsn}.xlsx")
+    filepath = os.path.join(CWD, filename)
     ws: Worksheet = None
     if os.path.isfile(filepath):
         wb = load_workbook(filepath)
