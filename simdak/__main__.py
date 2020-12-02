@@ -3,9 +3,6 @@ import os
 import shutil
 import logging
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 
 from . import paud as simdak_paud
 from .template import TEMPLATE_FILE
@@ -17,9 +14,21 @@ PASSWORD_HELP = "Kata sandi / email"
 SHEET_HELP = "Nama Sheet excel yang digunakan dokumen"
 
 
+class CommandContext:
+    def __init__(self, debug: bool):
+        self.debug = debug
+
+
 @click.group("paud")
-def paud():
-    pass
+@click.option("--debug/--no-debug", default=False)
+@click.pass_context
+def paud(ctx: click.Context, debug: bool):
+    context = CommandContext(debug)
+    ctx.obj = context
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
 
 
 @paud.command("bantuan")  # type: ignore
@@ -76,7 +85,9 @@ def exports(email: str, password: str, sheet: str, file: str):
 )
 @click.option("--dari", default=1, required=False, help="Dari nomor")
 @click.option("--ke", default=0, required=False, help="Ke nomor")
-@click.option("--simpan", default=True, is_flag=True, required=False, help="Simpan id")
+@click.option(
+    "--simpan/--no-simpan", default=True, is_flag=True, required=False, help="Simpan id"
+)
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
 @click.argument("file", default="", required=False)
 def imports(
