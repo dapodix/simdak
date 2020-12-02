@@ -17,6 +17,7 @@ from . import (
 
 
 class RkasData(BaseSimdakPaud):
+    INDEX = "A"
     MAPPING = {
         "jenis_komponen_id": "B",
         "jenis_penggunaan_id": "C",
@@ -37,12 +38,12 @@ class RkasData(BaseSimdakPaud):
         hargasatuan: int,
         data_id: str = "",
     ):
-        self.jenis_komponen_id = jenis_komponen_id
-        self.jenis_penggunaan_id = jenis_penggunaan_id
+        self.jenis_komponen_id = int(jenis_komponen_id)
+        self.jenis_penggunaan_id = int(jenis_penggunaan_id)
         self.jenisbelanja = jenisbelanja
-        self.qty = qty
+        self.qty = int(qty)
         self.satuan = satuan
-        self.hargasatuan = hargasatuan
+        self.hargasatuan = int(hargasatuan)
         if "=" in data_id:
             data_id = data_id.split("=")[-1]
         self.data_id = data_id
@@ -124,7 +125,7 @@ class RkasData(BaseSimdakPaud):
     def from_row(cls, ws: Union[Worksheet, Workbook], row: int) -> RkasData:
         data = {}
         for k, v in cls.MAPPING.items():
-            data[k] = ws[f"{v}{row}"]
+            data[k] = ws[f"{v}{row}"].value
         return cls(**data)
 
 

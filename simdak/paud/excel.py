@@ -7,6 +7,8 @@ from . import RkasData, SimdakPaud
 from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
+COL_INDEX = RkasData.INDEX
+COL_ID = RkasData.MAPPING.get("data_id")
 
 
 def exports(
@@ -24,12 +26,9 @@ def exports(
     wb = load_workbook(TEMPLATE_FILE)
     ws = wb.active
     ws.title = sheet
-    ws["A1"] = "No"
-    for k, v in RkasData.MAPPING.items():
-        ws[f"{v}1"] = k.replace("_", " ").title()
     for i, rkas_data in enumerate(rkas_datas):
         rkas_data.to_row(ws, i + 2)
-        ws[f"A{i+2}"] = i + 1
+        ws[f"{COL_INDEX}{i+2}"] = i + 1
     wb.save(filepath)
 
 
@@ -52,8 +51,10 @@ def imports(
         ws = wb.get_sheet_by_name(sheet) if sheet in sheets else wb.active
     row = start + 1 if header else start
     while True:
-        if not ws[f"B{row}"]:
+        if not ws[f"{COL_INDEX}{row}"].value:
             break
+        elif ws[f"{COL_ID}{row}"].value:
+            continue
         data = RkasData.from_row(ws, row)
         result = rkas.create(data)
         if result:

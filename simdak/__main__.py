@@ -8,9 +8,20 @@ from .template import TEMPLATE_FILE
 CWD = os.getcwd()
 
 
+class Setting(object):
+    def __init__(self, email: str, password: str, debug: bool = False):
+        self.email = email
+        self.password = password
+        self.debug = debug
+
+
 @click.group()
-def main():
-    pass
+@click.option("--email", prompt=True)
+@click.password_option()
+@click.option("--debug/--no-debug", default=False)
+@click.pass_context
+def main(ctx: click.Context, email: str, password: str, debug: bool):
+    ctx.obj = Setting(email, password)
 
 
 @click.command("template")
@@ -24,21 +35,21 @@ def template(nama: str):
 
 
 @click.command("export")
-@click.option("--email", prompt=True)
-@click.password_option()
+@click.pass_context
 @click.argument("nama", default="Simdak-Paud.xlsx", required=True)
-def exports(email: str, password: str, nama: str):
+def exports(ctx, nama: str):
+    setting: Setting = ctx.obj
     filepath = os.path.join(CWD, nama)
-    paud.exports(filepath, email, password)
+    paud.exports(filepath, setting.email, setting.password)
 
 
 @click.command("import")
-@click.option("--email", prompt=True)
-@click.password_option()
+@click.pass_context
 @click.argument("nama", default="Simdak-Paud.xlsx", required=True)
-def imports(email: str, password: str, nama: str):
+def imports(ctx, nama: str):
+    setting: Setting = ctx.obj
     filepath = os.path.join(CWD, nama)
-    paud.imports(filepath, email, password)
+    paud.imports(filepath, setting.email, setting.password)
 
 
 if __name__ == "__main__":
