@@ -18,8 +18,7 @@ class SimdakPaud(BaseSimdakPaud):
         params = {"r": "site/login"}
         res = self._session.get(self._base_url, params=params)
         if not res.status_code == 200:
-            self._logger.error("Error! tidak dapat menghubungi website simdak")
-            return False
+            raise Exception("Error! tidak dapat menghubungi website simdak")
         data = {
             "LoginForm[username]": self._email,
             "LoginForm[password]": self._password,
@@ -30,7 +29,7 @@ class SimdakPaud(BaseSimdakPaud):
         if res.ok and "DAK NON FISIK" in res.text:
             self._logger.debug(f"Berhasil login dengan {self._email}.")
             return True
-        self._logger.error(f"Error! gagal login dengan {self._email}.")
+        self._logger.error(f"Gagal login dengan {self._email}.")
         return False
 
     def logout(self) -> bool:
@@ -49,7 +48,7 @@ class SimdakPaud(BaseSimdakPaud):
         ):
             self._logger.debug("Berhasil mendapatkan halaman DAK")
             return True
-        self._logger.error("Error! gagal mendapatkan halaman DAK")
+        self._logger.error("Gagal mendapatkan halaman DAK")
         return False
 
     def __del__(self):

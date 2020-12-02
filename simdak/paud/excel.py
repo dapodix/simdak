@@ -3,13 +3,22 @@ import os
 from logging import getLogger
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from typing import Union
+from typing import List, Optional, Union
 from . import RkasData, SimdakPaud
 from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
 COL_INDEX = RkasData.INDEX
 COL_ID = RkasData.MAPPING.get("data_id")
+
+
+def find_one(datas: List[RkasData], rpd: str) -> Optional[RkasData]:
+    if not rpd or not datas:
+        return None
+    for d in datas:
+        if d.data_id == rpd:
+            return d
+    return None
 
 
 def exports(
@@ -55,16 +64,23 @@ def imports(
         wb = load_workbook(filepath)
         sheets = wb.get_sheet_names()
         ws = wb.get_sheet_by_name(sheet) if sheet in sheets else wb.active
+    rkas_datas = rkas.get(save_as=RkasData)
     row = start + 1 if header else start
+    imported = 0
     while True:
         if not ws[f"{COL_INDEX}{row}"].value:
             break
-        elif ws[f"{COL_ID}{row}"].value:
-            row += 1
-            continue
         data = RkasData.from_row(ws, row)
+        if ws[f"{COL_ID}{row}"].value:
+            old = find_one(rkas_datas, ws[f"{COL_ID}{row}"].value)
+            if old and data == old:
+                row += 1
+                continue
         result = rkas.create(data)
         if result:
             result.to_row(ws, row)
         row += 1
+        imported += 1
+    logger.info(f"Berhasil memasukan data sebanyak {imported}")
     wb.save(filepath)
+    logger.info(f"Berhasil menyimpan data terbaru")

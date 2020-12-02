@@ -17,15 +17,16 @@ from . import (
 
 
 class RkasData(BaseSimdakPaud):
+    # TODO : Refactor!
     INDEX = "A"
     MAPPING = {
-        "jenis_komponen_id": "B",
-        "jenis_penggunaan_id": "C",
+        "jenis_komponen_id": "H",
+        "jenis_penggunaan_id": "I",
         "jenisbelanja": "D",
         "qty": "E",
         "satuan": "F",
         "hargasatuan": "G",
-        "data_id": "H",
+        "data_id": "J",
     }
 
     def __init__(
@@ -48,6 +49,12 @@ class RkasData(BaseSimdakPaud):
             data_id = data_id.split("=")[-1]
         self.data_id = data_id
         self._logger.debug(f"RPD [{self}]")
+
+    def update(self, **kwargs) -> bool:
+        data = self.as_data(**kwargs)
+        params = {"r": "boppaudrkas/update", "id": self.data_id}
+        res = self._session.post(self._base_url, data, params=params)
+        return res.ok
 
     def delete(self) -> bool:
         params = {"r": "boppaudrkas/delete", "id": self.data_id}
@@ -85,9 +92,29 @@ class RkasData(BaseSimdakPaud):
 
     def to_row(self, ws: Union[Worksheet, Workbook], row: int):
         data = self.as_dict()
-        for k, v in data.items():
-            col = self.MAPPING[k]
-            ws[f"{col}{row}"] = v
+        try:
+            for k, v in data.items():
+                col = self.MAPPING[k]
+                ws[f"{col}{row}"] = v
+            # TODO : Buat ini dynamic
+            ws[f"B{row}"] = JENIS_KOMPONEN.get(self.jenis_komponen_id)
+            ws[f"C{row}"] = PENGGUNAAN.get(self.jenis_penggunaan_id)
+        except Exception as e:
+            self._logger.exception(
+                f"Gagal memasukkan data ke baris {row-1}, karena {e}"
+            )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, RkasData):
+            return super().__eq__(other)
+        return (
+            self.jenis_komponen_id == other.jenis_komponen_id
+            and self.jenis_penggunaan_id == other.jenis_penggunaan_id
+            and self.jenisbelanja == other.jenisbelanja
+            and self.qty == other.qty
+            and self.satuan == other.satuan
+            and self.hargasatuan == other.hargasatuan
+        )
 
     def __str__(self) -> str:
         s = [
@@ -197,6 +224,7 @@ class Rkas(BaseSimdakPaud):
 
 
 class SimdakRkasPaud(BaseSimdakPaud):
+    # TODO : Refactor!
     def __call__(self, semester_id: int = 20201) -> List[Rkas]:
         return self.get(semester_id)
 
