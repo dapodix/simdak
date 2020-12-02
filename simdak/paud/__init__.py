@@ -5,8 +5,8 @@ from .jenis_penggunaan import (
     PENGGUNAAN,
     get_key,
 )
-from .rkas import RkasData, Rkas, RkasPaud
+from .rkas import RkasData, Rkas, SimdakRkasPaud
 from .paud import SimdakPaud
 from .excel import exports, imports
 
-__all__ = ["RkasData", "Rkas", "RkasPaud", "SimdakPaud", "exports", "imports"]
+__all__ = ["RkasData", "Rkas", "SimdakRkasPaud", "SimdakPaud", "exports", "imports"]

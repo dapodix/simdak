@@ -1,17 +1,16 @@
 from requests import Session
 from logging import getLogger
-from . import BaseSimdakPaud, RkasPaud
+from . import BaseSimdakPaud, SimdakRkasPaud
 
 
 class SimdakPaud(BaseSimdakPaud):
     def __init__(self, email: str, password: str):
         self._logger = getLogger(self.__class__.__name__)
-        self._session = Session()
         self._email = email
         self._password = password
         self._login = self.login()
         self._modul = self.modul()
-        self.rkas = RkasPaud(self._session)
+        self.rkas = SimdakRkasPaud()
 
     def login(self) -> bool:
         params = {"r": "site/login"}

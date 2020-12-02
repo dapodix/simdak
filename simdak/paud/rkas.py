@@ -21,7 +21,6 @@ class RkasData(BaseSimdakPaud):
         qty: int,
         satuan: str,
         hargasatuan: int,
-        session: Session = None,
     ):
         self.jenis_komponen_id = jenis_komponen_id
         self.jenis_penggunaan_id = jenis_penggunaan_id
@@ -29,14 +28,11 @@ class RkasData(BaseSimdakPaud):
         self.qty = qty
         self.satuan = satuan
         self.hargasatuan = hargasatuan
-        self.session = session
 
     def as_data(self, **kwargs) -> dict:
-        jenis_komponen_id = str(self.jenis_komponen_id)
-        if jenis_komponen_id not in JENIS_PENGGUNAAN:
+        if self.jenis_komponen_id not in JENIS_PENGGUNAAN:
             raise ValueError(f"jenis komponen {self.jenis_komponen_id} tidak valid!")
-        jenis_penggunaan_id = str(self.jenis_penggunaan_id)
-        if jenis_penggunaan_id not in JENIS_PENGGUNAAN[jenis_komponen_id]:
+        if self.jenis_penggunaan_id not in JENIS_PENGGUNAAN[self.jenis_komponen_id]:
             raise ValueError(
                 f"jenis penggunaan {self.jenis_penggunaan_id} tidak valid!"
             )
@@ -51,8 +47,15 @@ class RkasData(BaseSimdakPaud):
         data.update(kwargs)
         return data
 
-    def __str__(self)->str:
-        return f"JK: {self.jenis_komponen_id}, JP: {self.jenis_penggunaan_id}, JB: {self.jenisbelanja}, Jumlah: {self.qty} {self.satuan}, Harga: {self.hargasatuan}"
+    def __str__(self) -> str:
+        s = [
+            f"JK: {self.jenis_komponen_id} ({JENIS_KOMPONEN[self.jenis_komponen_id]})",
+            f"JP: {self.jenis_penggunaan_id} ({PENGGUNAAN[self.jenis_penggunaan_id]})",
+            f"JB: {self.jenisbelanja}",
+            f"Jumlah: {self.qty} {self.satuan}",
+            f"Harga: {self.hargasatuan}",
+        ]
+        return ", ".join(s)
 
 
 class Rkas(BaseSimdakPaud):
@@ -68,7 +71,6 @@ class Rkas(BaseSimdakPaud):
         kegiatan_lainnya: str,
         jumlah: str,
         url: str,
-        session: Session,
     ):
         self.no = no
         self.npsn = npsn
@@ -81,7 +83,6 @@ class Rkas(BaseSimdakPaud):
         self.jumlah = jumlah
         self.url = url
         self.id = self.url.split("&")[1].split("=")[-1]
-        self.session = session
 
     def __call__(self, semester_id: int = 20201) -> List[RkasData]:
         return self.get(semester_id)
@@ -89,7 +90,7 @@ class Rkas(BaseSimdakPaud):
     def get(self, semester_id: int = 20201) -> List[RkasData]:
         results: List[RkasData] = []
         params = {"r": "boppaudrkas/create", "id": self.id, "semester_id": semester_id}
-        res = self.session.get(self._base_url, params=params)
+        res = self._session.get(self._base_url, params=params)
         if not res.ok:
             return results
         soup = BeautifulSoup(res.text, "html.parser")
@@ -102,7 +103,7 @@ class Rkas(BaseSimdakPaud):
             if not jenis_komponen_id:
                 continue
             jenis_penggunaan_id = get_key(
-                tds[3].get_text(), JENIS_PENGGUNAAN[str(jenis_komponen_id)]
+                tds[3].get_text(), JENIS_PENGGUNAAN[jenis_komponen_id]
             )
             if not jenis_penggunaan_id:
                 continue
@@ -113,7 +114,6 @@ class Rkas(BaseSimdakPaud):
                 qty=int(tds[5].get_text()),
                 satuan=tds[6].get_text(),
                 hargasatuan=int(tds[7].get_text()),
-                session=self.session,
             )
             results.append(result)
         return results
@@ -122,12 +122,10 @@ class Rkas(BaseSimdakPaud):
         data = rkas_data.as_data()
         data.update({"yt0": "Simpan"})
         params = {"r": "boppaudrkas/creat", "id": self.id, "semester_id": semester_id}
+        res = self._session.post(self._base_url, data=data, params=params)
 
 
-class RkasPaud(BaseSimdakPaud):
-    def __init__(self, session: Session):
-        self.session = session
-
+class SimdakRkasPaud(BaseSimdakPaud):
     def __call__(self, semester_id: int = 20201) -> List[Rkas]:
         results: List[Rkas] = []
         params = {
@@ -135,7 +133,7 @@ class RkasPaud(BaseSimdakPaud):
             "Boppaudrkas[semester_id]": semester_id,
             "yt0": "Cari",
         }
-        res = self.session.get(self._base_url, params=params)
+        res = self._session.get(self._base_url, params=params)
         if not res.status_code == 200:
             return results
         soup = BeautifulSoup(res.text, "html.parser")
@@ -152,7 +150,6 @@ class RkasPaud(BaseSimdakPaud):
                 kegiatan_lainnya=tds[7].get_text(),
                 jumlah=tds[8].get_text(),
                 url=self._domain + tds[9].find("a")["href"] or "",
-                session=self.session,
             )
             results.append(result)
         return results
