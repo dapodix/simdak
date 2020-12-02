@@ -44,9 +44,10 @@ class RkasData(BaseSimdakPaud):
         self.qty = int(qty)
         self.satuan = satuan
         self.hargasatuan = int(hargasatuan)
-        if "=" in data_id:
+        if data_id and "=" in data_id:
             data_id = data_id.split("=")[-1]
         self.data_id = data_id
+        self._logger.debug(f"RPD [{self}]")
 
     def delete(self) -> bool:
         params = {"r": "boppaudrkas/delete", "id": self.data_id}
@@ -90,8 +91,8 @@ class RkasData(BaseSimdakPaud):
 
     def __str__(self) -> str:
         s = [
-            f"JK: {self.jenis_komponen_id} ({JENIS_KOMPONEN[self.jenis_komponen_id]})",
-            f"JP: {self.jenis_penggunaan_id} ({PENGGUNAAN[self.jenis_penggunaan_id]})",
+            f"JK: {JENIS_KOMPONEN[self.jenis_komponen_id]}",
+            f"JP: {PENGGUNAAN[self.jenis_penggunaan_id]}",
             f"JB: {self.jenisbelanja}",
             f"Jumlah: {self.qty} {self.satuan}",
             f"Harga: {self.hargasatuan}",
@@ -154,6 +155,7 @@ class Rkas(BaseSimdakPaud):
         self.jumlah = jumlah
         self.url = url
         self.id = self.url.split("&")[1].split("=")[-1]
+        self._logger.info(f"RKAS ({self.id}) berhasil dibuka")
 
     def __call__(
         self, semester_id: int = 20201, save_as: Type[RkasData] = RkasData
@@ -174,7 +176,8 @@ class Rkas(BaseSimdakPaud):
             try:
                 result = save_as.from_tr(tr)
                 results.append(result)
-            except ValueError:
+            except ValueError as e:
+                self._logger.exception(e)
                 continue
         return results
 
@@ -183,7 +186,7 @@ class Rkas(BaseSimdakPaud):
     ) -> Optional[RkasData]:
         data = rkas_data.as_data()
         data.update({"yt0": "Simpan"})
-        params = {"r": "boppaudrkas/creat", "id": self.id, "semester_id": semester_id}
+        params = {"r": "boppaudrkas/create", "id": self.id, "semester_id": semester_id}
         res = self._session.post(self._base_url, data=data, params=params)
         if not res.ok:
             return None

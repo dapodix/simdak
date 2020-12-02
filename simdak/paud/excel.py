@@ -1,5 +1,6 @@
 from __future__ import annotations
 import os
+from logging import getLogger
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import Union
@@ -14,11 +15,13 @@ COL_ID = RkasData.MAPPING.get("data_id")
 def exports(
     email: str, password: str, filename: str = "", sheet: str = "Sheet1"
 ) -> None:
-    print("Export")
+    logger = getLogger("paud-export")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
+    logger.info(f"Berhasil masuk akun {email}, mendapatkan data RPD...")
     rkas_datas = rkas.get(save_as=RkasData)
-    filename = filename or f"{rkas.npsn}.xlsx"
+    filename = filename or f"{rkas.npsn}-Simdak-Paud"
+    logger.info(f"Mengeksport {len(rkas_datas)} data RPD ke [{filename}]...")
     if not filename.endswith(".xlsx"):
         filename += ".xlsx"
     filepath = os.path.join(CWD, filename)
@@ -30,6 +33,7 @@ def exports(
         rkas_data.to_row(ws, i + 2)
         ws[f"{COL_INDEX}{i+2}"] = i + 1
     wb.save(filepath)
+    logger.info(f"Berhasil mengeksport data ke {filename}!")
 
 
 def imports(
@@ -40,7 +44,7 @@ def imports(
     sheet: str = "Sheet1",
     header: bool = True,
 ) -> None:
-    print("Import")
+    logger = getLogger("paud-import")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
     filepath = os.path.join(CWD, filename)
@@ -54,9 +58,11 @@ def imports(
         if not ws[f"{COL_INDEX}{row}"].value:
             break
         elif ws[f"{COL_ID}{row}"].value:
+            row += 1
             continue
         data = RkasData.from_row(ws, row)
         result = rkas.create(data)
         if result:
             result.to_row(ws, row)
+        row += 1
     wb.save(filepath)

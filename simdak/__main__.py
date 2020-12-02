@@ -1,6 +1,11 @@
 import click
 import os
 import shutil
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 from . import paud as simdak_paud
 from .template import TEMPLATE_FILE
@@ -36,7 +41,7 @@ def template(nama: str):
     help=PASSWORD_HELP,
 )
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
-@click.argument("file", default="Simdak-Paud.xlsx", required=True)
+@click.argument("file", default="", required=False)
 def exports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengeksport data {email} ke {file}")
     simdak_paud.exports(email, password, file)
@@ -52,7 +57,7 @@ def exports(email: str, password: str, sheet: str, file: str):
     help=PASSWORD_HELP,
 )
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
-@click.argument("file", default="Simdak-Paud.xlsx", required=True)
+@click.argument("file", default="", required=False)
 def imports(email: str, password: str, sheet: str, file: str):
     click.echo(f"Mengimport data {email} dari {file}")
     simdak_paud.exports(email, password, file)
