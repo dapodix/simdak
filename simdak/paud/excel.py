@@ -31,8 +31,28 @@ def exports(email: str, password: str, filepath: str = "", sheet: str = "Sheet1"
     wb.save(filepath)
 
 
-def imports(email: str, password: str, filepath: str = "", sheet: str = "Sheet1"):
+def imports(
+    email: str,
+    password: str,
+    filepath: str = "",
+    start: int = 1,
+    sheet: str = "Sheet1",
+    header: bool = True,
+):
     print("Import")
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
     filepath = filepath or os.path.join(CWD, f"{rkas.npsn}.xlsx")
+    ws: Worksheet = None
+    if os.path.isfile(filepath):
+        wb = load_workbook(filepath)
+        sheets = wb.get_sheet_names()
+        ws = wb.get_sheet_by_name(sheet) if sheet in sheets else wb.active
+    row = start + 1 if header else start
+    while True:
+        if not ws[f"B{row}"]:
+            break
+        data = RkasData.from_row(ws, row)
+        result = rkas.create(data)
+        if result:
+            result.to_row(ws, row)
