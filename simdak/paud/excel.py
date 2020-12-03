@@ -43,6 +43,7 @@ def exports(
         ws[f"{COL_INDEX}{i+2}"] = i + 1
     wb.save(filepath)
     logger.info(f"Berhasil mengeksport data ke {filename}!")
+    simdak.logout()
 
 
 def imports(
@@ -95,3 +96,4 @@ def imports(
     if save:
         wb.save(filepath)
     logger.info(f"Berhasil menyimpan data terbaru")
+    simdak.logout()
