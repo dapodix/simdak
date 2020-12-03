@@ -218,6 +218,7 @@ class Rkas(BaseSimdakPaud):
             except ValueError as e:
                 self._logger.exception(e)
                 continue
+        self._logger.info(f"Berhasil mendapatkan {len(results)} rpd")
         return results
 
     def create(

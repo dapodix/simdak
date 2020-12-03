@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import click
 import os
 import shutil
@@ -14,6 +15,15 @@ PASSWORD_HELP = "Kata sandi / email"
 SHEET_HELP = "Nama Sheet excel yang digunakan dokumen"
 
 
+def log_level(level: int):
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+    if level == logging.DEBUG:
+        click.echo("Debug diaktifkan!")
+
+
 class CommandContext:
     def __init__(self, debug: bool):
         self.debug = debug
@@ -25,10 +35,7 @@ class CommandContext:
 def paud(ctx: click.Context, debug: bool):
     context = CommandContext(debug)
     ctx.obj = context
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
+    log_level(logging.DEBUG if debug else logging.INFO)
 
 
 @paud.command("bantuan")  # type: ignore
@@ -64,8 +71,10 @@ def template(nama: str):
     help=PASSWORD_HELP,
 )
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
+@click.option("--debug/--no-debug", required=False, default=False)
 @click.argument("file", default="", required=False)
-def exports(email: str, password: str, sheet: str, file: str):
+def exports(email: str, password: str, sheet: str, debug: bool, file: str):
+    log_level(logging.DEBUG if debug else logging.INFO)
     click.echo(f"Mengeksport data {email} ke {file}")
     try:
         simdak_paud.exports(email, password, file)
@@ -89,10 +98,19 @@ def exports(email: str, password: str, sheet: str, file: str):
     "--simpan/--no-simpan", default=True, is_flag=True, required=False, help="Simpan id"
 )
 @click.option("--sheet", default="Sheet1", required=False, help=SHEET_HELP)
+@click.option("--debug/--no-debug", required=False, default=False)
 @click.argument("file", default="", required=False)
 def imports(
-    email: str, password: str, dari: int, ke: int, simpan: bool, sheet: str, file: str
+    email: str,
+    password: str,
+    dari: int,
+    ke: int,
+    simpan: bool,
+    sheet: str,
+    debug: bool,
+    file: str,
 ):
+    log_level(logging.DEBUG if debug else logging.INFO)
     click.echo(f"Mengimport data {email} dari {file}")
     try:
         simdak_paud.imports(
@@ -110,6 +128,7 @@ def imports(
 
 
 main = click.CommandCollection("simdak", sources=[paud])
+
 
 if __name__ == "__main__":
     main()

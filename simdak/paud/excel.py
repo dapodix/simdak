@@ -64,16 +64,19 @@ def imports(
     filepath = os.path.join(CWD, filename)
     ws: Worksheet = None
     if os.path.isfile(filepath):
+        logger.debug(f"Membuka file {filename}")
         wb = load_workbook(filepath)
-        sheets = wb.get_sheet_names()
-        ws = wb.get_sheet_by_name(sheet) if sheet in sheets else wb.active
+        ws = wb.get_sheet_by_name(sheet) if sheet in wb.get_sheet_names() else wb.active
+        logger.debug(f"Membuka sheet {sheet} berhasil")
     rkas_datas = rkas.get(save_as=RkasData)
     row = start + 1 if header else start
     imported = 0
     while True:
         if row == ke:
+            logger.info(f"Selesai karena (awal = {start}) == (end = {ke})")
             break
         elif not ws[f"{COL_INDEX}{row}"].value:
+            logger.info(f"Selesai karena baris {row} kosong")
             break
         data = RkasData.from_row(ws, row)
         old = find_one(rkas_datas, data.data_id)
@@ -89,6 +92,7 @@ def imports(
             logger.debug(f"{row} dibuat")
             result = rkas.create(data)
         if result:
+            logger.info(f"Menyimpan id [{result.data_id}] daro baris {row+1}")
             ws[f"{COL_ID}{row}"] = result.data_id
         row += 1
         imported += 1
