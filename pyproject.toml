@@ -18,6 +18,7 @@ requests = "^2.25.0"
 bs4 = "^0.0.1"
 openpyxl = "^3.0.5"
 click = "^7.1.2"
+fuzzywuzzy = "^0.18.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
