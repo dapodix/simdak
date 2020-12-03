@@ -13,6 +13,7 @@ from . import (
     JENIS_PENGGUNAAN,
     PENGGUNAAN,
     get_key,
+    get_fuzz,
 )
 
 
@@ -20,13 +21,13 @@ class RkasData(BaseSimdakPaud):
     # TODO : Refactor!
     INDEX = "A"
     MAPPING = {
-        "jenis_komponen_id": "H",
-        "jenis_penggunaan_id": "I",
+        "jenis_komponen_id": "B",
+        "jenis_penggunaan_id": "C",
         "jenisbelanja": "D",
         "qty": "E",
         "satuan": "F",
         "hargasatuan": "G",
-        "data_id": "J",
+        "data_id": "H",
     }
 
     def __init__(
@@ -159,6 +160,12 @@ class RkasData(BaseSimdakPaud):
         data = {}
         for k, v in cls.MAPPING.items():
             data[k] = ws[f"{v}{row}"].value
+        col = cls.MAPPING["jenis_komponen_id"]
+        val = ws[f"{col}{row}"].value
+        data["jenis_komponen_id"] = get_fuzz(val, JENIS_KOMPONEN, 1)
+        col = cls.MAPPING["jenis_penggunaan_id"]
+        val = ws[f"{col}{row}"].value
+        data["jenis_penggunaan_id"] = get_fuzz(val, PENGGUNAAN, 21)
         return cls(**data)
 
 

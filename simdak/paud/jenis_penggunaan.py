@@ -1,4 +1,8 @@
+from fuzzywuzzy import fuzz
+from logging import getLogger
 from typing import Dict, Optional
+
+logger = getLogger(__name__)
 
 JENIS_PENGGUNAAN: Dict[int, Dict[int, str]] = {
     1: {
@@ -47,3 +51,12 @@ def get_key(nama: str, data: Dict[int, str] = JENIS_KOMPONEN) -> Optional[int]:
         if v == nama:
             return k
     return None
+
+
+def get_fuzz(f: str, data: Dict[int, str], default: int = 0, ok: int = 80) -> int:
+    for k, v in data.items():
+        if fuzz.ratio(v, f) > ok:
+            logger.debug(f"Key dari {f} ditemukan")
+            return k
+    logger.debug(f"Key dari {f} tidak ditemukan")
+    return default

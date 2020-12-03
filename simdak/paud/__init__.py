@@ -4,6 +4,7 @@ from .jenis_penggunaan import (
     JENIS_PENGGUNAAN,
     PENGGUNAAN,
     get_key,
+    get_fuzz
 )
 from .rkas import RkasData, Rkas, SimdakRkasPaud
 from .paud import SimdakPaud
