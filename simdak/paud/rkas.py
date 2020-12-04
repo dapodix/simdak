@@ -266,5 +266,6 @@ class SimdakRkasPaud(BaseSimdakPaud):
                 jumlah=tds[8].get_text(),
                 url=self._domain + tds[9].find("a")["href"] or "",
             )
+            self._logger.debug(f'Berhasil mendapat RKAS [{result.id}]')
             results.append(result)
         return results

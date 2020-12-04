@@ -1,6 +1,7 @@
 from requests import Session
 from logging import getLogger
 from . import BaseSimdakPaud, SimdakRkasPaud
+from simdak.config import HEADERS
 
 
 class SimdakPaud(BaseSimdakPaud):
@@ -8,6 +9,7 @@ class SimdakPaud(BaseSimdakPaud):
         self._logger = getLogger(self.__class__.__name__)
         self._email = email
         self._password = password
+        self._session.headers.update(HEADERS)
         self._login = self.login()
         self._modul = self.modul()
         self.rkas = SimdakRkasPaud()
