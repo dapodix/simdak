@@ -127,6 +127,30 @@ def imports(
         click.echo(f"Export data gagal! Karena {e}")
 
 
+@paud.command("reset")  # type: ignore
+@click.option("--email", required=True, prompt=True, help=EMAIL_HELP)
+@click.option(
+    "--password",
+    prompt=True,
+    hide_input=True,
+    confirmation_prompt=True,
+    help=PASSWORD_HELP,
+)
+@click.option("--semester", default=20201)
+@click.option("--debug/--no-debug", required=False, default=False)
+def reset(email: str, password: str, semester: int, debug: bool):
+    log_level(logging.DEBUG if debug else logging.INFO)
+    sp = simdak_paud.SimdakPaud(email, password)
+    rkas = sp.rkas.get(semester)[0]
+    rabs = rkas.get()
+    for rab in rabs:
+        if rab.delete():
+            click.echo(f"RAB [{rab.data_id}] berhasil dihapus")
+        else:
+            click.echo(f"RAB [{rab.data_id}] gagal dihapus")
+    sp.logout()
+
+
 main = click.CommandCollection("simdak", sources=[paud])
 
 
