@@ -1,3 +1,4 @@
+from __future__ import annotations
 from requests import Session
 from logging import getLogger
 from . import BaseSimdakPaud, SimdakRkasPaud

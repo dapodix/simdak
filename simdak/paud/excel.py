@@ -4,15 +4,15 @@ from logging import getLogger
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import List, Optional, Union
-from . import RkasData, SimdakPaud
+from . import Rab, SimdakPaud
 from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
-COL_INDEX = RkasData.INDEX
-COL_ID = RkasData.MAPPING.get("data_id")
+COL_INDEX = Rab.INDEX
+COL_ID = Rab.MAPPING.get("data_id")
 
 
-def find_one(datas: List[RkasData], rpd: str) -> Optional[RkasData]:
+def find_one(datas: List[Rab], rpd: str) -> Optional[Rab]:
     if not rpd or not datas:
         return None
     for d in datas:
@@ -28,7 +28,7 @@ def exports(
     simdak = SimdakPaud(email, password)
     rkas = simdak.rkas()[0]
     logger.info(f"Berhasil masuk akun {email}, mendapatkan data RPD...")
-    rkas_datas = rkas.get(save_as=RkasData)
+    rkas_datas = rkas.get(save_as=Rab)
     filename = filename or f"{rkas.npsn}-Simdak-Paud"
     logger.info(f"Mengeksport {len(rkas_datas)} data RPD ke [{filename}]...")
     if not filename.endswith(".xlsx"):
@@ -68,7 +68,7 @@ def imports(
         wb = load_workbook(filepath)
         ws = wb.get_sheet_by_name(sheet) if sheet in wb.get_sheet_names() else wb.active
         logger.debug(f"Membuka sheet {sheet} berhasil")
-    rkas_datas = rkas.get(save_as=RkasData)
+    rkas_datas = rkas.get(save_as=Rab)
     row = start + 1 if header else start
     imported = 0
     while True:
@@ -78,9 +78,9 @@ def imports(
         elif not ws[f"{COL_INDEX}{row}"].value:
             logger.info(f"Selesai karena baris {row} kosong")
             break
-        data = RkasData.from_row(ws, row)
+        data = Rab.from_row(ws, row)
         old = find_one(rkas_datas, data.data_id)
-        result: Optional[RkasData] = None
+        result: Optional[Rab] = None
         if old:
             if old == data:
                 logger.debug(f"{row} dilewati")
