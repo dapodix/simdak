@@ -77,9 +77,9 @@ class RkasData(BaseSimdakPaud):
         data = {
             "Boppaudrkas[jenis_komponen_id]": self.jenis_komponen_id,
             "Boppaudrkas[jenis_penggunaan_id]": self.jenis_penggunaan_id,
-            "Boppaudrkas[jenisbelanja]": self.jenisbelanja.replace(" ", "+"),
+            "Boppaudrkas[jenisbelanja]": self.jenisbelanja,
             "Boppaudrkas[qty]": self.qty,
-            "Boppaudrkas[satuan]": self.satuan.replace(" ", "+"),
+            "Boppaudrkas[satuan]": self.satuan,
             "Boppaudrkas[hargasatuan]": self.hargasatuan,
         }
         data.update(kwargs)
@@ -266,6 +266,6 @@ class SimdakRkasPaud(BaseSimdakPaud):
                 jumlah=tds[8].get_text(),
                 url=self._domain + tds[9].find("a")["href"] or "",
             )
-            self._logger.debug(f'Berhasil mendapat RKAS [{result.id}]')
+            self._logger.debug(f"Berhasil mendapat RKAS [{result.id}]")
             results.append(result)
         return results
