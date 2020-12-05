@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 __version__ = ""
 packages = find_packages(exclude=["tests*"])
 
-fn = os.path.join("telegram", "version.py")
+fn = os.path.join("simdak", "version.py")
 with open(fn) as fh:
     code = compile(fh.read(), fn, "exec")
     exec(code)
