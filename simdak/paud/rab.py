@@ -42,8 +42,11 @@ class Rab(BaseSimdakPaud):
         self.qty = int(qty)
         self.satuan = satuan
         self.hargasatuan = int(hargasatuan)
-        if data_id and "=" in data_id:
-            data_id = data_id.split("=")[-1]
+        if data_id:
+            if "=" in data_id:
+                data_id = data_id.split("=")[-1]
+            elif "/" in data_id:
+                data_id = data_id.split("/")[-1]
         self.data_id = data_id
         self._logger.debug(f"RPD [{self}]")
 
