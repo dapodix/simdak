@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from typing import List
 from . import BaseSimdakPaud, Rkas
 
+
 class SimdakRkasPaud(BaseSimdakPaud):
     # TODO : Refactor!
     def __call__(self, semester_id: int = 20201) -> List[Rkas]:
@@ -11,11 +12,10 @@ class SimdakRkasPaud(BaseSimdakPaud):
     def get(self, semester_id: int = 20201) -> List[Rkas]:
         results: List[Rkas] = []
         params = {
-            "r": "boppaudrkas/index",
             "Boppaudrkas[semester_id]": semester_id,
             "yt0": "Cari",
         }
-        res = self._session.get(self._base_url, params=params)
+        res = self._session.get(self._base_url + "boppaudrkas/index", params=params)
         if not res.status_code == 200:
             return results
         soup = BeautifulSoup(res.text, "html.parser")

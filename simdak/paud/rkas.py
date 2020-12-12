@@ -28,7 +28,14 @@ class Rkas(BaseSimdakPaud):
         self.kegiatan_lainnya = kegiatan_lainnya
         self.jumlah = jumlah
         self.url = url
-        self.id = self.url.split("&")[1].split("=")[-1]
+        self.semester_id = 20201
+        if "=" in url:
+            self.id = url.split("&")[1].split("=")[-1]
+        else:
+            urls = url.split("/")
+            self.id = urls[-3]
+            if urls[-1].isdigit():
+                self.semester_id = int(urls[-1])
         self._logger.info(f"RKAS ({self.id}) berhasil dibuka")
 
     def __call__(self, semester_id: int = 20201, save_as: Type[Rab] = Rab) -> List[Rab]:
@@ -36,8 +43,11 @@ class Rkas(BaseSimdakPaud):
 
     def get(self, semester_id: int = 20201, save_as: Type[Rab] = Rab) -> List[Rab]:
         results: List[Rab] = []
-        params = {"r": "boppaudrkas/create", "id": self.id, "semester_id": semester_id}
-        res = self._session.get(self._base_url, params=params)
+        url = (
+            self._base_url
+            + f"boppaudrkas/create/id/{self.id}/semester_id/{semester_id or self.semester_id}"
+        )
+        res = self._session.get(url)
         if not res.ok:
             return results
         soup = BeautifulSoup(res.text, "html.parser")
@@ -55,8 +65,11 @@ class Rkas(BaseSimdakPaud):
     def create(self, rkas_data: Rab, semester_id: int = 20201) -> Optional[Rab]:
         data = rkas_data.as_data()
         data.update({"yt0": "Simpan"})
-        params = {"r": "boppaudrkas/create", "id": self.id, "semester_id": semester_id}
-        res = self._session.post(self._base_url, data=data, params=params)
+        url = (
+            self._base_url
+            + f"boppaudrkas/create/id/{self.id}/semester_id/{semester_id or self.semester_id}"
+        )
+        res = self._session.post(url, data=data)
         if not res.ok:
             return None
         soup = BeautifulSoup(res.text, "html.parser")

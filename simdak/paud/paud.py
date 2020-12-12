@@ -18,8 +18,8 @@ class SimdakPaud(BaseSimdakPaud):
     def login(self) -> bool:
         if self._login:
             raise PermissionError("Anda sudah login.")
-        params = {"r": "site/login"}
-        res = self._session.get(self._base_url, params=params)
+        url = self._base_url + "site/login"
+        res = self._session.get(url)
         if not res.status_code == 200:
             raise Exception("Error! tidak dapat menghubungi website simdak")
         data = {
@@ -28,7 +28,7 @@ class SimdakPaud(BaseSimdakPaud):
             "LoginForm[rememberMe]": ["0", "1"],
             "yt0": "Masuk",
         }
-        res = self._session.post(self._base_url, data, params=params)
+        res = self._session.post(url, data)
         if res.ok and "DAK NON FISIK" in res.text:
             self._logger.debug(f"Berhasil login dengan {self._email}.")
             return True
@@ -36,14 +36,12 @@ class SimdakPaud(BaseSimdakPaud):
         return False
 
     def logout(self) -> bool:
-        params = {"r": "site/logout"}
-        res = self._session.get(self._base_url, params=params)
+        res = self._session.get(self._base_url + "site/logout")
         self._logger.debug(f"Berhasil keluar dari akun {self._email}")
         return res.ok
 
     def modul(self, jenisdak: str = "daknfpaud") -> bool:
-        params = {"r": "site/modul", "jenisdak": jenisdak}
-        res = self._session.get(self._base_url, params=params)
+        res = self._session.get(self._base_url + f"site/modul/jenisdak/{jenisdak}")
         if (
             res.ok
             and "RKAS" in res.text

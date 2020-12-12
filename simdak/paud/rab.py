@@ -51,16 +51,16 @@ class Rab(BaseSimdakPaud):
         for k, v in kwargs.items():
             if hasattr(self, k):
                 setattr(self, k, v)
-        data = self.as_data()
-        params = {"r": "boppaudrkas/update", "id": self.data_id}
-        res = self._session.post(self._base_url, data, params=params)
+        data = self.as_data(yt0="Simpan")
+        url = self._base_url + f"boppaudrkas/update/id/{self.data_id}"
+        res = self._session.post(url, data)
         if not res.ok:
             self._logger.warning(f"Gagal mengupdate data [{self.data_id}]")
         return self
 
     def delete(self) -> bool:
-        params = {"r": "boppaudrkas/delete", "id": self.data_id}
-        res = self._session.get(self._base_url, params=params)
+        url = self._base_url + f"boppaudrkas/delete/id/{self.data_id}"
+        res = self._session.post(url, data=None)
         return res.ok
 
     def as_data(self, **kwargs) -> dict:
