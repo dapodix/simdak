@@ -2,7 +2,7 @@ from __future__ import annotations
 from bs4 import Tag
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from typing import Union
+from typing import List, Union
 from . import (
     BaseSimdakPaud,
     JENIS_KOMPONEN,
@@ -166,3 +166,16 @@ class Rab(BaseSimdakPaud):
         val = ws[f"{col}{row}"].value
         data["jenis_penggunaan_id"] = get_fuzz(val, PENGGUNAAN, 21)
         return cls(**data)
+
+    @classmethod
+    def from_table(cls, table: Tag) -> List[Rab]:
+        results: List[Rab] = []
+        for tr in table.findAll("tr"):
+            try:
+                result = cls.from_tr(tr)
+                results.append(result)
+            except ValueError as e:
+                cls._logger.exception(e)
+                continue
+        cls._logger.info(f"Berhasil mendapatkan {len(results)} rpd")
+        return results
