@@ -52,14 +52,7 @@ class Rkas(BaseSimdakPaud):
             return results
         soup = BeautifulSoup(res.text, "html.parser")
         table: Tag = soup.findAll("table")[1]
-        for tr in table.findAll("tr"):
-            try:
-                result = save_as.from_tr(tr)
-                results.append(result)
-            except ValueError as e:
-                self._logger.exception(e)
-                continue
-        self._logger.info(f"Berhasil mendapatkan {len(results)} rpd")
+        results = save_as.from_table(table)
         return results
 
     def create(self, rkas_data: Rab, semester_id: int = 20201) -> Optional[Rab]:
