@@ -1,6 +1,7 @@
 from __future__ import annotations
 from bs4 import BeautifulSoup, Tag
 from typing import List, Optional, Type
+from simdak.exception import DataKosongException
 from . import BaseSimdakPaud, Rab
 
 
@@ -43,29 +44,33 @@ class Rkas(BaseSimdakPaud):
 
     def get(self, semester_id: int = 20201, save_as: Type[Rab] = Rab) -> List[Rab]:
         results: List[Rab] = []
-        url = (
-            self._base_url
-            + f"boppaudrkas/create/id/{self.id}/semester_id/{semester_id or self.semester_id}"
-        )
+        semester = semester_id or self.semester_id
+        url = self._base_url + f"boppaudrkas/create/id/{self.id}/semester_id/{semester}"
         res = self._session.get(url)
         if not res.ok:
             return results
         soup = BeautifulSoup(res.text, "html.parser")
-        table: Tag = soup.findAll("table")[1]
-        results = save_as.from_table(table)
+        table: List[Tag] = soup.findAll("table")
+        if not table or len(table) != 2:
+            raise DataKosongException(
+                f"Data tidak ditemukan untuk rkas [{self.id}] semester [{semester}]"
+            )
+        results = save_as.from_table(table[1])
         return results
 
     def create(self, rkas_data: Rab, semester_id: int = 20201) -> Optional[Rab]:
         data = rkas_data.as_data()
         data.update({"yt0": "Simpan"})
-        url = (
-            self._base_url
-            + f"boppaudrkas/create/id/{self.id}/semester_id/{semester_id or self.semester_id}"
-        )
+        semester = semester_id or self.semester_id
+        url = self._base_url + f"boppaudrkas/create/id/{self.id}/semester_id/{semester}"
         res = self._session.post(url, data=data)
         if not res.ok:
             return None
         soup = BeautifulSoup(res.text, "html.parser")
         table: List[Tag] = soup.findAll("table")
+        if not table or len(table) != 2:
+            raise DataKosongException(
+                f"Data tidak ditemukan untuk rkas [{self.id}] semester [{semester}]"
+            )
         tr: Tag = table[-1].findAll("tr")[-1]
         return Rab.from_tr(tr)
