@@ -1,5 +1,5 @@
-from requests import Session
 from logging import getLogger
+from requests import Session
 
 
 class BaseSimdakPaud(object):
@@ -8,4 +8,4 @@ class BaseSimdakPaud(object):
     _session = Session()
     _login = False
     _modul = False
-    _logger = getLogger("RkasPaud")
+    _logger = getLogger("SimdakPaud")
