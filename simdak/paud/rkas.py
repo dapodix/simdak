@@ -1,35 +1,28 @@
 from __future__ import annotations
 from bs4 import BeautifulSoup, Tag
+from dataclasses import dataclass
 from typing import List, Optional, Type
 from simdak.exception import DataKosongException
 from . import BaseSimdakPaud, Rab
 
 
+@dataclass
 class Rkas(BaseSimdakPaud):
-    def __init__(
-        self,
-        no: str,
-        npsn: str,
-        satuan_pendidikan: str,
-        alamat: str,
-        alokasi: str,
-        kegiatan_pembelajaran_dan_bermain: str,
-        kegiatan_pendukung: str,
-        kegiatan_lainnya: str,
-        jumlah: str,
-        url: str,
-    ):
-        self.no = no
-        self.npsn = npsn
-        self.satuan_pendidikan = satuan_pendidikan
-        self.alamat = alamat
-        self.alokasi = alokasi
-        self.kegiatan_pembelajaran_dan_bermain = kegiatan_pembelajaran_dan_bermain
-        self.kegiatan_pendukung = kegiatan_pendukung
-        self.kegiatan_lainnya = kegiatan_lainnya
-        self.jumlah = jumlah
-        self.url = url
-        self.semester_id = 20201
+    no: str
+    npsn: str
+    satuan_pendidikan: str
+    alamat: str
+    alokasi: str
+    kegiatan_pembelajaran_dan_bermain: str
+    kegiatan_pendukung: str
+    kegiatan_lainnya: str
+    jumlah: str
+    url: str
+    semester_id: int = 20201
+    id: str = ""
+
+    def __post_init__(self) -> None:
+        url = self.url
         if "=" in url:
             self.id = url.split("&")[1].split("=")[-1]
         else:
