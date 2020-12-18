@@ -1,5 +1,6 @@
 from __future__ import annotations
 from bs4 import Tag
+from dataclasses import dataclass
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import List, Union
@@ -12,36 +13,34 @@ from . import (
     get_fuzz,
 )
 
+INDEX = "A"
+MAPPING = {
+    "jenis_komponen_id": "B",
+    "jenis_penggunaan_id": "C",
+    "jenisbelanja": "D",
+    "qty": "E",
+    "satuan": "F",
+    "hargasatuan": "G",
+    "data_id": "H",
+}
 
+
+@dataclass
 class Rab(BaseSimdakPaud):
-    # TODO : Refactor!
-    INDEX = "A"
-    MAPPING = {
-        "jenis_komponen_id": "B",
-        "jenis_penggunaan_id": "C",
-        "jenisbelanja": "D",
-        "qty": "E",
-        "satuan": "F",
-        "hargasatuan": "G",
-        "data_id": "H",
-    }
+    jenis_komponen_id: int
+    jenis_penggunaan_id: int
+    jenisbelanja: str
+    qty: int
+    satuan: str
+    hargasatuan: int
+    data_id: str = ""
 
-    def __init__(
-        self,
-        jenis_komponen_id: int,
-        jenis_penggunaan_id: int,
-        jenisbelanja: str,
-        qty: int,
-        satuan: str,
-        hargasatuan: int,
-        data_id: str = "",
-    ):
-        self.jenis_komponen_id = int(jenis_komponen_id)
-        self.jenis_penggunaan_id = int(jenis_penggunaan_id)
-        self.jenisbelanja = jenisbelanja
-        self.qty = int(qty)
-        self.satuan = satuan
-        self.hargasatuan = int(hargasatuan)
+    def __post_init__(self) -> None:
+        self.jenis_komponen_id = int(self.jenis_komponen_id)
+        self.jenis_penggunaan_id = int(self.jenis_penggunaan_id)
+        self.qty = int(self.qty)
+        self.hargasatuan = int(self.hargasatuan)
+        data_id = self.data_id
         if data_id:
             if "=" in data_id:
                 data_id = data_id.split("=")[-1]
@@ -99,7 +98,7 @@ class Rab(BaseSimdakPaud):
         data = self.as_dict()
         try:
             for k, v in data.items():
-                col = self.MAPPING[k]
+                col = MAPPING[k]
                 ws[f"{col}{row}"] = v
             # TODO : Buat ini dynamic
             ws[f"B{row}"] = JENIS_KOMPONEN.get(self.jenis_komponen_id)
@@ -157,12 +156,12 @@ class Rab(BaseSimdakPaud):
     @classmethod
     def from_row(cls, ws: Union[Worksheet, Workbook], row: int) -> Rab:
         data = {}
-        for k, v in cls.MAPPING.items():
+        for k, v in MAPPING.items():
             data[k] = ws[f"{v}{row}"].value
-        col = cls.MAPPING["jenis_komponen_id"]
+        col = MAPPING["jenis_komponen_id"]
         val = ws[f"{col}{row}"].value
         data["jenis_komponen_id"] = get_fuzz(val, JENIS_KOMPONEN, 1)
-        col = cls.MAPPING["jenis_penggunaan_id"]
+        col = MAPPING["jenis_penggunaan_id"]
         val = ws[f"{col}{row}"].value
         data["jenis_penggunaan_id"] = get_fuzz(val, PENGGUNAAN, 21)
         return cls(**data)

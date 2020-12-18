@@ -5,11 +5,12 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from typing import List, Optional, Union
 from . import Rab, SimdakPaud
+from .rab import INDEX, MAPPING
 from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
-COL_INDEX = Rab.INDEX
-COL_ID = Rab.MAPPING.get("data_id")
+COL_INDEX = INDEX
+COL_ID = MAPPING.get("data_id")
 
 
 def find_one(datas: List[Rab], rpd: str) -> Optional[Rab]:
