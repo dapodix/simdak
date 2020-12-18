@@ -18,7 +18,7 @@ Buka cmd,
   <summary>Cara membuka cmd</summary>
    Buka folder (tempat menyimpan data)
    Ketik cmd di bar alamat
-   ![bar alamat][img/open-cmd.jpg]
+   ![bar alamat](./img/open-cmd.jpg)
    Enter
 </details>
 
