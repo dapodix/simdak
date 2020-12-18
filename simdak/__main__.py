@@ -151,6 +151,20 @@ def reset(email: str, password: str, semester: int, debug: bool):
     sp.logout()
 
 
+@paud.command("status")
+@click.option("--debug/--no-debug", required=False, default=False)
+def status(debug: bool):
+    log_level(logging.DEBUG if debug else logging.INFO)
+    try:
+        if simdak_paud.SimdakPaud.is_online():
+            click.echo("Status : ONLINE")
+        else:
+            click.echo("Status : OFFLINE")
+    except Exception as e:
+        logging.debug(e)
+        click.echo("Status : OFFLINE")
+
+
 main = click.CommandCollection("simdak", sources=[paud])
 
 
