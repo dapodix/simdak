@@ -23,12 +23,11 @@ setup(
     install_requires=["python", "requests", "bs4", "openpyxl", "click"],
     include_package_data=True,
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Education",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Education :: Testing",
         "Topic :: Education",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
