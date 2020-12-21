@@ -6,10 +6,11 @@ from simdak.config import HEADERS
 
 
 class SimdakPaud(BaseSimdakPaud):
-    def __init__(self, email: str, password: str):
+    def __init__(self, email: str, password: str, retry: int = 3):
         self._logger = getLogger(self.__class__.__name__)
         self._email = email
         self._password = password
+        self._retry = retry
         self._session.headers.update(HEADERS)
         self._login = self.login()
         self._modul = self.modul()
@@ -20,7 +21,9 @@ class SimdakPaud(BaseSimdakPaud):
             raise PermissionError("Anda sudah login.")
         url = self._base_url + "site/login"
         res = self._session.get(url)
-        if not res.status_code == 200:
+        while not res.status_code == 200 and self._retry > 0:
+            res = self._session.get(url)
+        else:
             raise Exception("Error! tidak dapat menghubungi website simdak")
         data = {
             "LoginForm[username]": self._email,
