@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simdak"
-version = "1.0.0"
+version = "1.0.1"
 description = "Importer-exporter data Simdak Kemdikbud"
 authors = ["hexatester <habibrohman@gmail.com>"]
 license = "GPLv3"
