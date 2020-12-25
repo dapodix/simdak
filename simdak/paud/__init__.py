@@ -1,4 +1,5 @@
 from .base import BaseSimdakPaud
+from .auth import SimdakPaudAuth
 from .jenis_penggunaan import (
     JENIS_KOMPONEN,
     JENIS_PENGGUNAAN,
@@ -12,4 +13,12 @@ from .simdak import SimdakRkasPaud
 from .paud import SimdakPaud
 from .excel import exports, imports
 
-__all__ = ["Rab", "Rkas", "SimdakRkasPaud", "SimdakPaud", "exports", "imports"]
+__all__ = [
+    "SimdakPaudAuth",
+    "Rab",
+    "Rkas",
+    "SimdakRkasPaud",
+    "SimdakPaud",
+    "exports",
+    "imports",
+]
