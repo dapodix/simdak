@@ -56,6 +56,7 @@ def imports(
     sheet: str = "Sheet1",
     header: bool = True,
     save: bool = True,
+    update_id: bool = False,
 ) -> None:
     logger = getLogger("paud-import")
     simdak = SimdakPaud(email, password)
@@ -91,7 +92,7 @@ def imports(
             result = old.update(**data.as_dict())
         else:
             logger.debug(f"{row} dibuat")
-            result = rkas.create(data)
+            result = rkas.create(data, update_id=update_id)
         if result:
             logger.info(f"Menyimpan id [{result.data_id}] daro baris {row+1}")
             ws[f"{COL_ID}{row}"] = result.data_id
