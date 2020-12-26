@@ -55,15 +55,15 @@ class Rab(BaseSimdakPaud):
                 setattr(self, k, v)
         data = self.as_data(yt0="Simpan")
         url = self._base_url + f"boppaudrkas/update/id/{self.data_id}"
-        res = self._session.post(url, data)
-        if not res.ok:
+        res = self._session.post(url, data, allow_redirects=False)
+        if res.status_code != 302:
             self._logger.warning(f"Gagal mengupdate data [{self.data_id}]")
         return self
 
     def delete(self) -> bool:
         url = self._base_url + f"boppaudrkas/delete/id/{self.data_id}"
-        res = self._session.post(url, data=None)
-        return res.ok
+        res = self._session.post(url, data=None, allow_redirects=False)
+        return res.status_code == 302
 
     def as_data(self, **kwargs) -> dict:
         if self.jenis_komponen_id not in JENIS_PENGGUNAAN:
