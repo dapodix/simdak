@@ -4,9 +4,8 @@ from .jenis_penggunaan import (
     JENIS_KOMPONEN,
     JENIS_PENGGUNAAN,
     PENGGUNAAN,
-    get_key,
-    get_fuzz,
 )
+from .utils import get_fuzz, get_key
 from .rab import Rab
 from .rkas import Rkas
 from .simdak import SimdakRkasPaud
