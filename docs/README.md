@@ -12,15 +12,7 @@ Cara menginstall simdak bisa dilihat [di sini](install.md)
 
 Pastikan anda telah [menginstall simdak](install.md)!
 
-Buka cmd,
-
-<details> 
-  <summary>Cara membuka cmd</summary>
-   Buka folder (tempat menyimpan data)
-   Ketik cmd di bar alamat
-   ![bar alamat](./img/open-cmd.jpg)
-   Enter
-</details>
+Buka cmd ([cara membuka cmd](./install#cara-membuka-cmd)),
 
 Masukan perintah
 
