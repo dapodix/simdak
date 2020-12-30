@@ -35,5 +35,5 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    entry_points={"console_scripts": ["simdak=simdak.__main__:main"]},
+    entry_points={"console_scripts": ["simdak=simdak.main:main"]},
 )

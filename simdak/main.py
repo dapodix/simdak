@@ -5,8 +5,9 @@ import shutil
 import logging
 
 
-from . import paud as simdak_paud
-from .template import TEMPLATE_FILE
+from simdak import paud as simdak_paud
+from simdak.gui import MainApp
+from simdak.template import TEMPLATE_FILE
 
 CWD = os.getcwd()
 
@@ -29,13 +30,18 @@ class CommandContext:
         self.debug = debug
 
 
-@click.group("paud")
+@click.group("paud", invoke_without_command=True)
 @click.option("--debug/--no-debug", default=False)
 @click.pass_context
 def paud(ctx: click.Context, debug: bool):
     context = CommandContext(debug)
     ctx.obj = context
     log_level(logging.DEBUG if debug else logging.INFO)
+    if ctx.invoked_subcommand is None:
+        app = MainApp()
+        app.mainloop()
+    else:
+        click.echo(f"Simdak : {ctx.invoked_subcommand}")
 
 
 @paud.command("bantuan")  # type: ignore
@@ -165,7 +171,8 @@ def status(debug: bool):
         click.echo("Status : OFFLINE")
 
 
-main = click.CommandCollection("simdak", sources=[paud])
+# main = click.CommandCollection("simdak", sources=[paud])
+main = paud
 
 
 if __name__ == "__main__":
