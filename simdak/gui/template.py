@@ -6,11 +6,14 @@ from simdak.template import TEMPLATE_FILE
 
 
 def template() -> None:
-    filepath = asksaveasfilename(
+    filepath: str = asksaveasfilename(
         initialdir="/",
         title="Simpan file",
         filetypes=(("Excel file", "*.xlsx"), ("semua file", "*.*")),
     )
+    if not filepath:
+        return
+    filepath = filepath if filepath.endswith(".xlsx") else filepath + ".xlsx"
     try:
         shutil.copy(TEMPLATE_FILE, filepath)
         res = askquestion("Sukses", "Berhasil membuat template, buka file?")
