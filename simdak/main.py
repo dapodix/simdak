@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import click
+import importlib
 import os
 import shutil
 import logging
 
 
 from simdak import paud as simdak_paud
-from simdak.gui import MainApp
 from simdak.template import TEMPLATE_FILE
+from simdak.util import is_module_available
 
 CWD = os.getcwd()
 
@@ -37,7 +38,9 @@ def paud(ctx: click.Context, debug: bool):
     context = CommandContext(debug)
     ctx.obj = context
     log_level(logging.DEBUG if debug else logging.INFO)
-    if ctx.invoked_subcommand is None:
+    if ctx.invoked_subcommand is None and is_module_available("tkinter"):
+        from simdak.gui import MainApp
+
         app = MainApp()
         app.mainloop()
     else:
